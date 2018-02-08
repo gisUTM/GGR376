@@ -5,14 +5,6 @@ nMobileHom, number of mobile homes
 nBadPlumbi, number of houses with incomplete plumbing
 nBadKitche, number of houses with incomplete kitchens
 Population, total population
-Males, number of males
-Females, number of females
-Under5, number of persons under five
-White, number of persons identifying themselves as white (only)
-Black, number of persons identifying themselves African-american (only)
-AmericanIn, number of persons identifying themselves American Indian (only)
-Asian, number of persons identifying themselves as American Indian (only)
-Hispanic, number of persons identifying themselves as hispanic (only)
 PopInHouse, number of persons living in households
 nHousehold, number of households
 Families, number of families
@@ -22,5 +14,4 @@ nRooms, median number of rooms per house
 nBedrooms, median number of bedrooms per house
 medHHinc, median household income
 MedianAge, median age of population
-householdS, median household size
-familySize, median family size
+
