@@ -13,4 +13,3 @@ nRooms, median number of rooms per house
 nBedrooms, median number of bedrooms per house
 medHHinc, median household income
 MedianAge, median age of population
-
