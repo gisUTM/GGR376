@@ -1,6 +1,5 @@
 variable, explanation
 nhousingUn, number of housing units
-recHouses, number of houses for recreational use
 nMobileHom, number of mobile homes
 nBadPlumbi, number of houses with incomplete plumbing
 nBadKitche, number of houses with incomplete kitchens
