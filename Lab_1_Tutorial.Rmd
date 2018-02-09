@@ -190,7 +190,6 @@ abline(lm(houseValue~yearBuilt, data = sd_houses))
 ```{r}
 ggplot(data = sd_houses)+
   geom_boxplot( mapping = aes(x = "", y = nBedrooms)) # Note: x = ""
-
 # In this example the value is not extreme, it is fine to leave it. 
 ```
 
@@ -222,8 +221,8 @@ sd_houses%>%
   map(hist) 
 ```
 
-### Data Transformations
-We will demonstrate the first data transformation for houseValue
+#### Data Transformations
+First data transformation for houseValue
 
 ```{r}
 sd_trans <- sd_houses%>%
@@ -231,7 +230,7 @@ sd_trans <- sd_houses%>%
 # Chain on addition mutates with the pipe
 ```
 
-### Chained mutations
+#### Chained mutations
 ```{r}
 sd_trans <- sd_houses%>%
   mutate(logValue = log(houseValue+1))%>%
@@ -239,23 +238,19 @@ sd_trans <- sd_houses%>%
   mutate(logPlumb = log(pBadPlumbi+1))%>%
   mutate(logKitchen = log(pBadKitche+1))%>%
   select(-houseValue, -pMobileHom, -pBadPlumbi, -pBadKitche)
-
 ```
 
-### Correlation Matrix
-
-
+#### Correlation Matrix
 ```{r}
 cor_mat <- cor(sd_trans%>%
                  select(-GEOID)) # Exclude as it will not be used in calculations.
-
 corrplot::corrplot(cor_mat, cl.pos = "b", tl.pos = "d")
 ```
 
-### Variable Selection
-
-We will begin with a manual approach to variable selection.
-- Begin with the strongest predictor variable based on the correlation plot, which appear to be median age.
+#### Variable Selection
+In the tutorial a manual approach to variable selection will be applied.
+- Begin with the strongest predictor variable based on the correlation plot, which appears to be median age.
+- Add variables and check how they affect the model.
 
 ```{r}
 model_1 <- lm(logValue ~ MedianAge, data = sd_trans)
@@ -267,13 +262,12 @@ model_1
 ```
 
 Use the summary function
-
 ```{r}
 summary(model_1)
 ```
 
-We see that our predictor is statistically significant and so is the the overall model.
-The adjusted R-Squared is 0.36, thus we can explain 36% of the variation in the dependent variable with our model.
+The predictor variable, MedianAge, is statistically significant and is the the overall model.
+The adjusted R-Squared is 0.36, thus the model's explains 36% of the variation in the dependent variable with our model.
 
 ### Recall Assumptions of the model
 
