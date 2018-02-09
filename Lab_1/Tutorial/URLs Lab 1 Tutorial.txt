@@ -1,0 +1,10 @@
+URLs in the Lab 1 Workshop
+
+https://raw.githubusercontent.com/tidyverse/readr/master/inst/extdata/mtcars.csv
+
+https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_prices.csv
+https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_attributes.csv
+
+https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/Attribute_Definitions.txt
+
+https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_polygons.geojson

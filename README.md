@@ -15,3 +15,5 @@ Lab 1 Files are in .../Lab_1/Tutorial/
     + Average household price for California CTs
 - Lab_1_Tutorial.Rmd
     + R notebook file TA uses in Tutorial
+- URLs Lab 1 Tutorial
+    + URLs used in the tutorial
