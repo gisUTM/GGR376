@@ -267,7 +267,7 @@ summary(model_1)
 ```
 
 The predictor variable, MedianAge, is statistically significant and is the the overall model.
-The adjusted R-Squared is 0.36, thus the model's explains 36% of the variation in the dependent variable with our model.
+The adjusted R-Squared is 0.36, thus the model's explains 36% of the variation in the dependent variable.
 
 ### Recall Assumptions of the model
 
@@ -293,7 +293,7 @@ Without any work we know we have satisfied:
 mean(model_1$residuals)
 ```
 
-If you do not want your numbers to be in scientific notation, run the following command
+R by default uses scientific notation. To change this run the following command.
 ```{r}
 options(scipen=999)
 ```
@@ -307,26 +307,23 @@ To set it back
 ```{r}
 options(scipen=0)
 mean(model_1$residuals)
-
 ```
 
-Let's keep it changed
+Remove the scientific notation and re-run the summary for model_1
 ```{r}
 options(scipen=999)
 # Go back and run the summary of your model_1
 ```
 
 #### Homoscedasticity of residuals or equal variance
-We are looking for a flat line in the first and third plots.
-
+Check for a flat line in the first and third plots.
 ```{r}
-par(mfrow=c(2,2)) # set 2 rows and 2 column plot layout
+par(mfrow=c(2,2)) # set 2 rows and 2 column plot layout in base R
 plot(model_1)
 ```
 
-It is apparent that observations 402, 405 and 471 are causing some issues in
-our model. Take a look at their values by using the slice function.
-
+Oobservations 402, 405 and 471 are causing some issues in
+the model. Take a look at their values  using the slice function.
 ```{r}
 sd_trans%>%
   # Slice the two rows using a vector c(402, 471)
