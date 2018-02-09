@@ -504,7 +504,6 @@ california_spdf <- merge(california_polygons, model_3_dataframe, by.x = "GEOID",
 ```
 
 Map the residuals 
-
 ```{r}
 library(latticeExtra)
 spplot(california_spdf, "residuals")
@@ -580,9 +579,13 @@ moran.test(california_spdf$residuals, california_listw)
 moran.mc(california_spdf$residuals, california_listw, 999)
 ```
 
-#### Spatial Regression Models: Spatial Lag and Spatial Error
-- In class we have discussed the two types of spatial models.
+#### Spatial Regression
+1. Spatial Lag 
+2. Spatial Error
 
+#### Spatial Lag Model
+
+spdep::larsarlm()
 ```{r}
 # Spatial Lag
 lag_model = lagsarlm(logValue ~ MedianAge + nBedrooms,
@@ -604,6 +607,8 @@ moran.mc(california_spdf$lagResids, california_listw, 999)
 ```
 
 #### Spatial Error Model
+
+spdep::errorsarlm()
 ```{r}
 error_model = errorsarlm(logValue ~ MedianAge + nBedrooms,
                      data = california_spdf,
@@ -611,7 +616,6 @@ error_model = errorsarlm(logValue ~ MedianAge + nBedrooms,
 ```
 
 Check the error model residuals for spatial auto-correlation.
-
 ```{r}
 # Add error model residuals to SpatialPolygonDataFrame
 california_spdf$errorResids <- residuals(error_model)
