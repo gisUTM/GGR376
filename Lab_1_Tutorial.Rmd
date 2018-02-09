@@ -1,0 +1,603 @@
+---
+title: "GGR376 - Lab 1 - Tutorial"
+subtitle: "Regression"
+output: html_notebook
+---
+### Reading Data
+
+#### Files on your hard drive:
+- Navigate to: https://raw.githubusercontent.com/tidyverse/readr/master/inst/extdata/mtcars.csv
+- Download the file with "Save As"
+    + Note where the file is saved
+
+```{r}
+library(tidyverse)
+
+# Read in our csv file
+mtcars <- read_csv("**actual_file_location**/mtcars.csv")
+
+# View the data
+mtcars
+```
+
+#### Files from the internet
+Read in files stored on the internet using the url.
+
+```{r}
+mtcars_url <- read_csv("https://raw.githubusercontent.com/tidyverse/readr/master/inst/extdata/mtcars.csv")
+```
+
+View the data using RStudio's View()
+```{r}
+View(mtcars_url)
+```
+
+
+Read the help file for the read_csv() function, using the ? or help() function.
+```{r}
+?read_csv
+# or
+help(read_csv)
+```
+
+#### Examine the environment panel in RStudio 
+
+Remove both versions of the mtcars data
+```{r}
+remove(mtcars, mtcars_url)
+```
+
+## Regression Exercise
+
+The TA will walk you through the process of regression and spatial regression. This tutorial was inspired by Roger Bivand's Spatial Regression examples on rspatial.org. Your assignment will require you to produce a similar work using Canadian Census Data.
+
+The data for this tutorial is stored in three files on a GitHub account. It is California house price data from the 2000 Census, and the files include:
+
+- Average house price per census tract file
+- Census tract attributes file
+- Census tract polygon file. 
+
+They all share a GEOID variable, which can be used to join the files. 
+
+### Merging Tables
+Read in the housing price file and the attributes file.
+```{r}
+house_prices <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/house_prices.csv")
+house_attributes <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/house_attributes.csv", guess_max = 9500) 
+```
+
+The tables need to be joined. The dplyr package includes a functions for joining data.frames/tibbles. See the Data Wrangling Cheat Sheet for visual examples: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+
+- dplyr::left_join(), Join matching rows from b to a.
+    + NAs possible
+- dplyr::right_join(), Join matching rows from a to b.
+    + NAs possible
+- dplyr::inner_join(), Join data, retain only rows in both sets
+    + No NAs, rows excluded that create a NA
+- dplyr::full_join(), Join data, retain all values, all rows. 
+    + NAs possible
+
+Rows with missing values will need to be excluded in the regression model. Use an inner_join() so no NAs will be introduced.
+
+```{r}
+california_cts <- inner_join(house_prices, house_attributes, by = "GEOID")
+california_cts
+```
+
+Another file contains attribute definitions. Read in and store as a tibble.
+
+```{r}
+variable_attributes <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/Attribute_Definitions.txt")
+variable_attributes
+```
+
+### Data Management
+These data are at the census tract level of geography. There are 7,049 census tracts. 
+The regression model will focus on San Diego County. 
+
+1. Split the label variable into three variables:
+    1. CT
+    2. County
+    3. State
+2. Remove any extra spaces before or adter a county name, which can occur when 
+splitting strings.
+3. Filter County == "San Diego County"
+
+```{r}
+san_diego <- california_cts%>%
+  separate(label, sep = ",", into = c("CT", "County", "State"))%>% # Split
+  mutate(County = str_trim(County, side = "both"))%>% # Remove   
+  filter(County == "San Diego County") # Filter
+
+san_diego
+```
+
+### Modify the count variables
+Create ratio variables from count variables. Many variables are only dependent 
+on CT population, which won't be helpful in the linear regression model.
+
+```{r}
+san_diego_ratios <- san_diego%>%
+  # Proportion of mobile homes to total units
+  mutate(pMobileHom = nMobileHom/nhousingUn)%>%
+  mutate(pBadPlumbi = nBadPlumbi/nhousingUn)%>%
+  mutate(pBadKitche = nBadKitche/nhousingUn)
+```
+
+#### Potential Predictors
+The tutorial will focus on seven predictor variables:
+
+- yearBuilt
+- nRooms
+- nBedrooms
+- MedianAge
+- pMobileHom
+- pBadPlumbi
+- pBadKitche
+
+Subset the variables we will use in the model
+```{r}
+# Include GEOID and houseValue
+sd_houses <- san_diego_ratios %>%
+  select(GEOID, houseValue, yearBuilt, nRooms, nBedrooms, MedianAge, pMobileHom,
+         pBadPlumbi, pBadKitche)
+```
+
+#### Review Data Values: e.g. zeros where data should have values.
+```{r}
+sd_houses%>%
+  summary()
+
+# Notice houseValue, yearBuilt, nRooms, nBedrooms
+```
+
+Filter out rows with 0 values for either houseValue, yearBuilt, nRooms, nBedrooms
+```{r}
+sd_houses <- sd_houses %>%
+  filter(yearBuilt > 0 , houseValue > 0 , nRooms > 0, nBedrooms >0 )
+
+# Check the summary
+sd_houses%>%
+  summary
+```
+
+### Graphical Analysis Pre-Check
+- Scatter plot: Check for linear relationships between predictors and dependent
+- Box plot: Outlier check
+- Histogram: Check variables for normal distributions
+
+Each plot type will be demonstrated. Then you need to complete the remainder. Base R plots 
+are fine for variable review.
+
+Including mapping = aes(x = yearBuilt, y = houseValue in the ggplot() function 
+removes the need to specify the x and y for each geom added.
+
+##### Scatter Plot ggplot2()
+```{r}
+ggplot(data = sd_houses, mapping = aes(x = yearBuilt, y = houseValue))+
+  geom_point()+
+  geom_smooth(method = "lm", se = F)
+```
+
+##### Scatter Plot Base R
+```{r}
+plot(sd_houses$yearBuilt, sd_houses$houseValue)
+# To include the regression line, we use abline()
+abline(lm(houseValue~yearBuilt, data = sd_houses))
+```
+
+##### Box plot ggplot2()
+```{r}
+ggplot(data = sd_houses)+
+  geom_boxplot( mapping = aes(x = "", y = nBedrooms)) # Note: x = ""
+
+# In this example the value is not extreme, it is fine to leave it. 
+```
+
+##### Box plot base r
+```{r}
+boxplot(sd_houses$nBedrooms) # Much easier to work with base R here.
+```
+
+##### Histogram in ggplot2
+```{r}
+ggplot(sd_houses)+
+  geom_histogram(mapping = aes(x = houseValue))
+# Warning can be ignored because this plot is temporary
+```
+
+#### Histogram in base r
+```{r}
+hist(sd_houses$houseValue)
+```
+
+#### Normality test - shaprio.test()
+The null hypothesis of this test is that the data are normal.
+```{r}
+sd_houses%>%
+  # We can ignore GEOID in this test
+  select(-GEOID)%>% 
+  
+  # Map allows us to apply a function to each variable in our tibble
+  map(hist) 
+```
+
+### Data Transformations
+We will demonstrate the first data transformation for houseValue
+
+```{r}
+sd_trans <- sd_houses%>%
+  mutate(logValue = log(houseValue+1)) # We add 1 to each value so we don't get -Inf
+# Chain on addition mutates with the pipe
+```
+
+### Chained mutations
+```{r}
+sd_trans <- sd_houses%>%
+  mutate(logValue = log(houseValue+1))%>%
+  mutate(logMobile = log(pMobileHom+1))%>%
+  mutate(logPlumb = log(pBadPlumbi+1))%>%
+  mutate(logKitchen = log(pBadKitche+1))%>%
+  select(-houseValue, -pMobileHom, -pBadPlumbi, -pBadKitche)
+
+```
+
+### Correlation Matrix
+
+
+```{r}
+cor_mat <- cor(sd_trans%>%
+                 select(-GEOID)) # Exclude as it will not be used in calculations.
+
+corrplot::corrplot(cor_mat, cl.pos = "b", tl.pos = "d")
+```
+
+### Variable Selection
+
+We will begin with a manual approach to variable selection.
+- Begin with the strongest predictor variable based on the correlation plot, which appear to be median age.
+
+```{r}
+model_1 <- lm(logValue ~ MedianAge, data = sd_trans)
+```
+
+Take a look at the model.
+```{r}
+model_1
+```
+
+Use the summary function
+
+```{r}
+summary(model_1)
+```
+
+We see that our predictor is statistically significant and so is the the overall model.
+The adjusted R-Squared is 0.36, thus we can explain 36% of the variation in the dependent variable with our model.
+
+### Recall Assumptions of the model
+
+1. The mean of the residuals is zero
+2. Homoscedasticity of residuals or equal variance
+3. Multicollinearity
+4. The independent variables and residuals are uncorrelated
+5. The variability in X values is positive
+6. The number of observations must be greater than number of independent
+7. Normality of residuals
+8. No auto-correlation of residuals
+
+Without any work we know we have satisfied: 
+5. The variability in X values is positive
+    + Which is based on when we looked at the ranges of all our our variables.
+
+6. The number of observations must be greater than number of independent
+    + We have hundreds of observations (rows) in our dataset.
+    
+#### The mean of the residuals is zero
+```{r}
+# Mean of the residuals is zero
+mean(model_1$residuals)
+```
+
+If you do not want your numbers to be in scientific notation, run the following command
+```{r}
+options(scipen=999)
+```
+
+Now call the function.
+```{r}
+mean(model_1$residuals)
+```
+
+To set it back
+```{r}
+options(scipen=0)
+mean(model_1$residuals)
+
+```
+
+Let's keep it changed
+```{r}
+options(scipen=999)
+# Go back and run the summary of your model_1
+```
+
+#### Homoscedasticity of residuals or equal variance
+We are looking for a flat line in the first and third plots.
+
+```{r}
+par(mfrow=c(2,2)) # set 2 rows and 2 column plot layout
+plot(model_1)
+```
+
+It is apparent that observations 402, 405 and 471 are causing some issues in
+our model. Take a look at their values by using the slice function.
+
+```{r}
+sd_trans%>%
+  # Slice the two rows using a vector c(402, 471)
+  slice(c(402, 471, 405))
+```
+
+Recall from the boxplot of MedianAge that these are extreme values. Let's remove
+them from the set as they do not represent the overall distribution of age in study area and refit the model.
+
+```{r}
+sd_trans_sub <- sd_trans%>%
+  # We can use a minus sign to include everything in the slice except those two rows.
+  slice(-c(402, 471, 405))
+
+model_2 <- lm(logValue ~ MedianAge, sd_trans_sub)
+summary(model_2)
+```
+```{r}
+par(mfrow=c(2,2)) # set 2 rows and 2 column plot layout
+plot(model_2)
+```
+
+Before we move on, let's try adding in an additional variables.
+- nBedrooms
+
+```{r}
+model_3 <- lm(logValue ~ MedianAge + nBedrooms, data = sd_trans_sub)
+
+summary(model_3) # We increased our Adj.R.SQ by ~0.04
+```
+
+Check that we didn't introduce heteroscedasticity.
+```{r}
+par(mfrow=c(2,2)) # set 2 rows and 2 column plot layout
+plot(model_2) 
+```
+
+Let's try adding one more variable.
+```{r}
+model_4 <- lm(logValue ~ MedianAge + nBedrooms + logKitchen, data = sd_trans_sub)
+
+summary(model_4) 
+# No increase to our Adj.R.SQ
+# Also it is not staitically significant
+
+```
+
+Let's try adding one more variable.
+```{r}
+model_5 <- lm(logValue ~ MedianAge + nBedrooms + nRooms, data = sd_trans_sub)
+
+summary(model_5) 
+
+
+```
+
+-nBedrooms is no longer significant and it is suffering from multicollinearity as its sign flipped.
+    + Confirm this with car::vif
+    
+```{r}
+library(car)
+vif(model_5)
+```
+
+# Spend ten minutes trying out additional models and using the summary and plot.
+
+### We will work with model_3
+
+```{r}
+summary(model_3)
+```
+
+### Continue Assumption Checks
+#### Multicolinearity
+```{r}
+vif(model_3)
+```
+Values are less than 4, we can move on.
+
+#### Correlation between residuals and independent variables
+```{r}
+# Test for significant correlation between residuals and MedianAge
+cor.test(model_3$residuals, sd_trans_sub$MedianAge)
+
+# Test for significant correlation between residuals and nBedrooms
+cor.test(model_3$residuals, sd_trans_sub$nBedrooms)
+
+```
+
+- No issues of correlation
+
+### Normality of residuals
+
+- We could check it with the normal Q-Q plot or we can create a histogram.
+- With our large sample size it is possible to relax this assumption
+    + i.e. we do not need to be extremely strict.
+
+```{r}
+hist(model_3$residuals)
+```
+
+We will accept this deviation in our case from normality because of our large sample size. 
+    
+#### Auto-correlation of residuals
+
+This is geographical data and we need to test for spatial correlation of our residuals. At the moment our data is not geographical, so we will need to introduce this into our data. The steps for checking for spatial auto-correlation include:
+
+1. Import spatial boundaries.
+2. Join or data and residuals.
+3. Moran's I calculation for residuals.
+4. If spatial-autocorrelation occurs, use a spatial-error or spatial-lag model.
+
+### Spatial Boundaries
+We have a number of classes for spatial data in R, which are included in the sp package.
+
+- SpatialPoints or SpatialPointsDataFrame
+- SpatialLines or SpatialLinesDataFrame
+- SpatialPolygons or SpatialPolygonsDataFrame
+
+For each of these, the first class is only able to store geometry. The second class that include Spatial***DataFrame allows you to store variables along with the geometry.
+
+```{r}
+library(sp)
+?SpatialPolygonsDataFrame
+```
+
+The polygon data is stored on the GitHub page and can be opened using the readOGR function in the rgdal package
+
+```{r}
+library(rgdal)
+?readOGR
+```
+
+```{r}
+california_polygons <- readOGR("https://raw.githubusercontent.com/gisUTM/GGR376/master/house_polygons.geojson")
+```
+
+Get some information about the data.
+```{r}
+class(california_polygons)
+```
+
+Plot the boundaries
+```{r}
+plot(california_polygons)
+```
+
+Take a look at the Data.Frame. It contains one variable GEOID, which we can use in joining our data and results.
+```{r}
+california_polygons@data
+```
+
+- Create a dataframe with the model residuals and the model input data
+```{r}
+model_3_dataframe <- cbind(sd_trans_sub, residuals = model_3$residuals)
+model_3_dataframe
+```
+
+- Join the new dataframe to the sp object.
+```{r}
+california_spdf <- merge(california_polygons, model_3_dataframe, by.x = "GEOID", all.x = FALSE)
+```
+
+- Map out housing 
+
+```{r}
+library(latticeExtra)
+spplot(california_spdf, "residuals")
+```
+
+- This is a pretty ugly map, let's explore different colour choices.
+
+```{r fig.height=7}
+display.brewer.all()
+```
+
+- Create a palette to be used in our map with 7 colours (6 breaks)
+
+### Automated Variabel Selection
+```{r}
+col_palette <- brewer.pal(n = 7, name = "BrBG")
+
+spplot(california_spdf, "residuals",
+       col.regions = col_palette, # The colour palette you just created
+       cuts = 6, # Cuts is the number of colours - 1
+       col = "transparent") # This sets the border colour, try changing to "black"
+```
+
+- It appears that there is a strong spatial relationship with the residuals as we move away from the water. 
+
+#### Confirm Spatial Auto-Correlation with Moran's I
+- Moran's I requires we calculate spatial weights
+    + Points: most often distances
+    + Polygons: Neighbours or distances
+
+- We calculate the neighbours list with spdep::poly2nb()
+
+```{r}
+library(spdep)
+california_nb <- poly2nb(california_spdf)
+```
+
+- Plot spatial relationships
+```{r}
+par(mai=c(0,0,0,0))
+plot(california_spdf)
+plot(california_nb, coordinates(california_spdf), col='red', lwd=2, add=TRUE)
+```
+
+- It is pretty mess on the west coast, but this demonstrates the relationships stored in the neighbours list.
+
+#### Moran's I
+```{r}
+# Convert Neigbours List to Spatial Weights
+california_listw <- nb2listw(california_nb)
+
+moran.test(california_spdf$residuals, california_listw)
+moran.mc(california_spdf$residuals, california_listw, 999)
+```
+
+#### Spatial Regression Models: Spatial Lag and Spatial Error
+- In class we have discussed the two types of spatial models.
+
+```{r}
+# Spatial Lag
+lag_model = lagsarlm(logValue ~ MedianAge + nBedrooms,
+                     data = california_spdf,
+                     listw = california_listw)
+```
+
+Get more details with the summary function
+```{r}
+summary(lag_model)
+```
+
+Check the residuals for spatial auto-correlation.
+
+- Add residuals from lag model to SpatialPolygonDataFrame
+```{r}
+california_spdf$lagResids <- residuals(lag_model)
+moran.mc(california_spdf$lagResids, california_listw, 999)
+```
+
+#### Spatial Error Model
+```{r}
+error_model = errorsarlm(logValue ~ MedianAge + nBedrooms,
+                     data = california_spdf,
+                     listw = california_listw)
+```
+
+Check the error model residuals for spatial auto-correlation.
+
+```{r}
+# Add error model residuals to SpatialPolygonDataFrame
+california_spdf$errorResids <- residuals(error_model)
+
+# Moran's I
+moran.mc(california_spdf$errorResids, california_listw, 999)
+```
+
+#### One last plot of the residuals
+```{r}
+spplot(california_spdf, "errorResids",
+       col.regions = col_palette, # The colour palette you just created
+       cuts = 6, # Cuts is the number of colours - 1
+       col = "transparent")
+```
+
