@@ -3,6 +3,11 @@ title: "GGR376 - Lab 1 - Tutorial"
 subtitle: "Regression"
 output: html_notebook
 ---
+```{r}
+library(tidyverse)
+```
+
+
 ### Reading Data
 
 #### Files on your hard drive:
@@ -11,8 +16,6 @@ output: html_notebook
     + Note where the file is saved
 
 ```{r}
-library(tidyverse)
-
 # Read in our csv file
 mtcars <- read_csv("**actual_file_location**/mtcars.csv")
 
@@ -62,8 +65,8 @@ They all share a GEOID variable, which can be used to join the files.
 ### Merging Tables
 Read in the housing price file and the attributes file.
 ```{r}
-house_prices <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/house_prices.csv")
-house_attributes <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/house_attributes.csv", guess_max = 9500) 
+house_prices <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_prices.csv")
+house_attributes <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_attributes.csv", guess_max = 9500) 
 ```
 
 The tables need to be joined. The dplyr package includes a functions for joining data.frames/tibbles. See the Data Wrangling Cheat Sheet for visual examples: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
@@ -87,7 +90,7 @@ california_cts
 Another file contains attribute definitions. Read in and store as a tibble.
 
 ```{r}
-variable_attributes <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/Attribute_Definitions.txt")
+variable_attributes <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/Attribute_Definitions.txt")
 variable_attributes
 ```
 
@@ -398,13 +401,12 @@ vif(model_5)
 - plot()
 
 ### Continue with model_3
-
 ```{r}
 summary(model_3)
 ```
 
 ### Continue Assumption Checks
-#### Multicolinearity
+#### Multicollinearity
 ```{r}
 vif(model_3)
 ```
@@ -420,65 +422,72 @@ cor.test(model_3$residuals, sd_trans_sub$nBedrooms)
 
 ```
 
-- No issues of correlation
+- No issues of correlation, p-value > 0.05
 
 ### Normality of residuals
 
-- We could check it with the normal Q-Q plot or we can create a histogram.
-- With our large sample size it is possible to relax this assumption
+- Can check  with the normal Q-Q plot, histogram, or shapiro.test(model_3$residuals).
+- Given the large sample size, it is possible to relax this assumption
     + i.e. we do not need to be extremely strict.
 
 ```{r}
 hist(model_3$residuals)
 ```
 
-We will accept this deviation in our case from normality because of our large sample size. 
-    
+This is an acceptable amount of deviation from normal given the large sample size.
+
 #### Auto-correlation of residuals
 
-This is geographical data and we need to test for spatial correlation of our residuals. At the moment our data is not geographical, so we will need to introduce this into our data. The steps for checking for spatial auto-correlation include:
+Geographical data often suffers from spatial auto-correlation of the residuals.
 
-1. Import spatial boundaries.
-2. Join or data and residuals.
-3. Moran's I calculation for residuals.
-4. If spatial-autocorrelation occurs, use a spatial-error or spatial-lag model.
+The steps for checking for spatial auto-correlation include:
 
-### Spatial Boundaries
-We have a number of classes for spatial data in R, which are included in the sp package.
+1. Import spatial boundaries
+    + data.frame is not geographical
+2. Join data and residuals
+3. Moran's I calculation for residuals
+4. If spatial-autocorrelation occurs, use a spatial-error or spatial-lag model
+
+### Spatial Data in R
+Spatial data can be stored in spatial data classes from the package.
 
 - SpatialPoints or SpatialPointsDataFrame
 - SpatialLines or SpatialLinesDataFrame
 - SpatialPolygons or SpatialPolygonsDataFrame
 
-For each of these, the first class is only able to store geometry. The second class that include Spatial***DataFrame allows you to store variables along with the geometry.
+For each of these, the first class is only able to store geometry. 
+The second class, Spatial*DataFrame allows variables along with geometry.
 
 ```{r}
 library(sp)
 ?SpatialPolygonsDataFrame
 ```
 
-The polygon data is stored on the GitHub page and can be opened using the readOGR function in the rgdal package
+The polygon data is stored on the GitHub page and can be opened using:
+- rgdal::readOGR() 
 
 ```{r}
 library(rgdal)
 ?readOGR
 ```
 
+Data are stored in a geoJSON
+
 ```{r}
-california_polygons <- readOGR("https://raw.githubusercontent.com/gisUTM/GGR376/master/house_polygons.geojson")
+california_polygons <- readOGR("https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_polygons.geojson")
 ```
 
-Get some information about the data.
+Check the class (type) of the variable california_polygons
 ```{r}
 class(california_polygons)
 ```
 
-Plot the boundaries
+Plot the spatial boundaries
 ```{r}
 plot(california_polygons)
 ```
 
-Take a look at the Data.Frame. It contains one variable GEOID, which we can use in joining our data and results.
+Take a look at the data. It contains one variable GEOID, which can be used in joining the data and residuals.
 ```{r}
 california_polygons@data
 ```
@@ -489,64 +498,84 @@ model_3_dataframe <- cbind(sd_trans_sub, residuals = model_3$residuals)
 model_3_dataframe
 ```
 
-- Join the new dataframe to the sp object.
+- Join the new dataframe to the sp object using sp::merge()
 ```{r}
 california_spdf <- merge(california_polygons, model_3_dataframe, by.x = "GEOID", all.x = FALSE)
 ```
 
-- Map out housing 
+Map the residuals 
 
 ```{r}
 library(latticeExtra)
 spplot(california_spdf, "residuals")
 ```
 
-- This is a pretty ugly map, let's explore different colour choices.
-
+This is a ugly map. We have colour Brewer schemes in R
 ```{r fig.height=7}
 display.brewer.all()
 ```
 
-- Create a palette to be used in our map with 7 colours (6 breaks)
-
-### Automated Variabel Selection
+Create a colour palette to be used in our map with 7 colours (6 breaks)
 ```{r}
 col_palette <- brewer.pal(n = 7, name = "BrBG")
 
+col_palette 
+```
+
+Generate the map
+```{r}
 spplot(california_spdf, "residuals",
        col.regions = col_palette, # The colour palette you just created
        cuts = 6, # Cuts is the number of colours - 1
        col = "transparent") # This sets the border colour, try changing to "black"
 ```
 
-- It appears that there is a strong spatial relationship with the residuals as we move away from the water. 
+Spatial auto-correlation is indicated by this plot. 
 
 #### Confirm Spatial Auto-Correlation with Moran's I
-- Moran's I requires we calculate spatial weights
+- Moran's I requires spatial weights
     + Points: most often distances
     + Polygons: Neighbours or distances
 
-- We calculate the neighbours list with spdep::poly2nb()
-
+Create a list of polygons that share borders with spdep::poly2nb()
+- It would be possible to add connections in this list
+- E.g. areas that do not physically touch by are connect by a bridge across a bay.
 ```{r}
 library(spdep)
 california_nb <- poly2nb(california_spdf)
 ```
 
-- Plot spatial relationships
-```{r}
+Plot neighbour connections
+```{r fig.height = 10}
 par(mai=c(0,0,0,0))
 plot(california_spdf)
 plot(california_nb, coordinates(california_spdf), col='red', lwd=2, add=TRUE)
 ```
 
-- It is pretty mess on the west coast, but this demonstrates the relationships stored in the neighbours list.
+It is congested on the west coast, but this demonstrates the relationships stored in the neighbours list.
 
-#### Moran's I
+#### Moran's I Calculation
+
+1. The neighbours list must be changed to weights based on the number of neighbours.
+    + If a polygon has 5 neighbours, each weight is 0.2.
+2. moran.test() 
+    + sensitive to the form of the graph of neighbour relationships and other factors
+    + best to check results with those of moran.mc() 
+3. moran.mc()
+
+Convert Neigbours List to Spatial Weights
 ```{r}
-# Convert Neigbours List to Spatial Weights
 california_listw <- nb2listw(california_nb)
 
+print("View the neighbours for polygon 20")
+california_listw$neighbours[[20]]
+
+print("View the weights for polygon 20")
+california_listw$weights[[20]]
+```
+
+Run the two tests for Moran's I
+```{r}
 moran.test(california_spdf$residuals, california_listw)
 moran.mc(california_spdf$residuals, california_listw, 999)
 ```
