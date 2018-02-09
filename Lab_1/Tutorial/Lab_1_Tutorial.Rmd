@@ -330,29 +330,34 @@ sd_trans%>%
   slice(c(402, 471, 405))
 ```
 
-Recall from the boxplot of MedianAge that these are extreme values. Let's remove
-them from the set as they do not represent the overall distribution of age in study area and refit the model.
+Recall from the boxplot of MedianAge that these are extreme values. Remove them 
+from the model input, as it is okay in this scenario to exclude area of very old
+houses. 
 
 ```{r}
 sd_trans_sub <- sd_trans%>%
-  # We can use a minus sign to include everything in the slice except those two rows.
+  # We can use a minus sign to include everything in the slice except those rows
   slice(-c(402, 471, 405))
+```
 
-model_2 <- lm(logValue ~ MedianAge, sd_trans_sub)
+Fit the model with the subset data.
+```{r}
+model_2 <- lm(logValue ~ MedianAge, sd_trans_sub) # Note the name change
 summary(model_2)
 ```
+
+Plot the assesment graphics
 ```{r}
 par(mfrow=c(2,2)) # set 2 rows and 2 column plot layout
 plot(model_2)
 ```
 
-Before we move on, let's try adding in an additional variables.
+Add a second variable to the model.
 - nBedrooms
 
 ```{r}
 model_3 <- lm(logValue ~ MedianAge + nBedrooms, data = sd_trans_sub)
-
-summary(model_3) # We increased our Adj.R.SQ by ~0.04
+summary(model_3) # The Adj.R.SQ increased by ~0.04
 ```
 
 Check that we didn't introduce heteroscedasticity.
@@ -366,31 +371,33 @@ Let's try adding one more variable.
 model_4 <- lm(logValue ~ MedianAge + nBedrooms + logKitchen, data = sd_trans_sub)
 
 summary(model_4) 
-# No increase to our Adj.R.SQ
-# Also it is not staitically significant
 
 ```
+No increase to the Adj.R.SQ
+- It is not staitically significant
 
-Let's try adding one more variable.
+
+Add nRooms
 ```{r}
 model_5 <- lm(logValue ~ MedianAge + nBedrooms + nRooms, data = sd_trans_sub)
 
 summary(model_5) 
-
-
 ```
 
--nBedrooms is no longer significant and it is suffering from multicollinearity as its sign flipped.
-    + Confirm this with car::vif
+- nBedrooms is no longer significant 
+    + Multicollinearity is occuring because its cofficient sign flipped.
+    + Confirm multicollinearity with car::vif()
     
 ```{r}
 library(car)
 vif(model_5)
 ```
 
-# Spend ten minutes trying out additional models and using the summary and plot.
+# Spend ten minutes testing additional models 
+- summary()
+- plot()
 
-### We will work with model_3
+### Continue with model_3
 
 ```{r}
 summary(model_3)
