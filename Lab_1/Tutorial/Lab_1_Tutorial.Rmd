@@ -3,6 +3,9 @@ title: "GGR376 - Lab 1 - Tutorial"
 subtitle: "Regression"
 output: html_notebook
 ---
+
+#### Open a new R Script in RStudio
+
 ```{r}
 library(tidyverse)
 ```
