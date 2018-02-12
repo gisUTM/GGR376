@@ -6,6 +6,8 @@ output: html_notebook
 
 #### Open a new R Script in RStudio
 
+Scripts must be saved with the .R extension
+
 ```{r}
 library(tidyverse)
 ```
