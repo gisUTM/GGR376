@@ -644,5 +644,5 @@ summary(lm.LMtests(model_3, california_listw, test="all"))
 ```
 
 In This example, it is not very helpful as they are both significant.
-
 A theoretical underpinning should be applied to select the model.
+
