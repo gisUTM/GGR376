@@ -12,7 +12,6 @@ Scripts must be saved with the .R extension
 library(tidyverse)
 ```
 
-Files must be saved as .R extensions.
 ### Reading Data
 
 #### Files on your hard drive:
