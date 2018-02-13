@@ -1,8 +1,17 @@
 ---
 title: "GGR376 - Lab 1 - Tutorial"
-subtitle: "Regression"
-output: html_notebook
+subtitle: Regression
+output:
+  pdf_document: default
+  html_notebook: default
 ---
+
+```{r echo = FALSE}
+# Remove comments to produce a PDF without code results
+#library(knitr)
+#opts_chunk$set(eval = F)
+```
+
 
 #### Open a new R Script in RStudio
 
@@ -31,7 +40,8 @@ mtcars
 Read in files stored on the internet using the url.
 
 ```{r}
-mtcars_url <- read_csv("https://raw.githubusercontent.com/tidyverse/readr/master/inst/extdata/mtcars.csv")
+mtcars_url <- read_csv(
+  "https://raw.githubusercontent.com/tidyverse/readr/master/inst/extdata/mtcars.csv")
 ```
 
 View the data using RStudio's View()
@@ -69,8 +79,11 @@ They all share a GEOID variable, which can be used to join the files.
 ### Merging Tables
 Read in the housing price file and the attributes file.
 ```{r}
-house_prices <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_prices.csv")
-house_attributes <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_attributes.csv", guess_max = 9500) 
+house_prices <- read_csv(
+  "https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_prices.csv")
+house_attributes <- read_csv(
+  "https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_attributes.csv",
+  guess_max = 9500) 
 ```
 
 The tables need to be joined. The dplyr package includes a functions for joining data.frames/tibbles. See the Data Wrangling Cheat Sheet for visual examples: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
@@ -94,7 +107,8 @@ california_cts
 Another file contains attribute definitions. Read in and store as a tibble.
 
 ```{r}
-variable_attributes <- read_csv("https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/Attribute_Definitions.txt")
+variable_attributes <- read_csv(
+  "https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/Attribute_Definitions.txt")
 variable_attributes
 ```
 
@@ -478,7 +492,8 @@ library(rgdal)
 Data are stored in a geoJSON
 
 ```{r}
-california_polygons <- readOGR("https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_polygons.geojson")
+california_polygons <- readOGR(
+  "https://raw.githubusercontent.com/gisUTM/GGR376/master/Lab_1/Tutorial/house_polygons.geojson")
 ```
 
 Check the class (type) of the variable california_polygons
@@ -638,12 +653,12 @@ spplot(california_spdf, "errorResids",
 
 ## Lagrange Multiplier diagnostics
 
-Should be run prior to selecting error or lag model.
+You would run this test prior to selecting the error or lag model.
 
 ```{r}
 summary(lm.LMtests(model_3, california_listw, test="all"))
 ```
 
-In This example, it is not very helpful as they are both significant.
+In this example, it is not very helpful as they are both significant.
 A theoretical underpinning should be applied to select the model.
 
