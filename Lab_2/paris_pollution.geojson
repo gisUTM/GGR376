@@ -1,0 +1,26 @@
+{
+"type": "FeatureCollection",
+"name": "paris_pollution",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32631" } },
+"features": [
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "GEN", "POINT_X": 448255.9692, "POINT_Y": 5419882.524, "NEAR_FID": 0, "NEAR_DIST": 8880.3328182599998, "PM": 5 }, "geometry": { "type": "Point", "coordinates": [ 448255.9692, 5419882.524 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "LOGNES", "POINT_X": 473028.7721, "POINT_Y": 5409289.177, "NEAR_FID": 0, "NEAR_DIST": 20781.925723799999, "PM": 8 }, "geometry": { "type": "Point", "coordinates": [ 473028.7721, 5409289.177 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "RN2", "POINT_X": 455312.56, "POINT_Y": 5416740.88, "NEAR_FID": 0, "NEAR_DIST": 5510.3307803199996, "PM": 7 }, "geometry": { "type": "Point", "coordinates": [ 455312.56, 5416740.88 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "DEF", "POINT_X": 444106.9741, "POINT_Y": 5415425.677, "NEAR_FID": 0, "NEAR_DIST": 8983.89998328, "PM": 10 }, "geometry": { "type": "Point", "coordinates": [ 444106.9741, 5415425.677 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "A1", "POINT_X": 452871.3799, "POINT_Y": 5419266.779, "NEAR_FID": 0, "NEAR_DIST": 7235.7739296199998, "PM": 6 }, "geometry": { "type": "Point", "coordinates": [ 452871.3799, 5419266.779 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "NOGENT", "POINT_X": 462154.2864, "POINT_Y": 5409851.197, "NEAR_FID": 0, "NEAR_DIST": 9968.2606928799996, "PM": 12 }, "geometry": { "type": "Point", "coordinates": [ 462154.286399999983, 5409851.19699999969 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "GON", "POINT_X": 458706.8143, "POINT_Y": 5427421.443, "NEAR_FID": 0, "NEAR_DIST": 16608.6165716, "PM": 15 }, "geometry": { "type": "Point", "coordinates": [ 458706.8143, 5427421.443 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "PA18", "POINT_X": 452054.3037, "POINT_Y": 5415635.916, "NEAR_FID": 0, "NEAR_DIST": 3611.0837700900001, "PM": 21 }, "geometry": { "type": "Point", "coordinates": [ 452054.303699999989, 5415635.916 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "PA04C", "POINT_X": 452430.305, "POINT_Y": 5412044.461, "NEAR_FID": 0, "NEAR_DIST": 0.0, "PM": 25 }, "geometry": { "type": "Point", "coordinates": [ 452430.305, 5412044.461 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "BOB", "POINT_X": 459918.2233, "POINT_Y": 5416762.541, "NEAR_FID": 0, "NEAR_DIST": 8850.37848648, "PM": 30 }, "geometry": { "type": "Point", "coordinates": [ 459918.2233, 5416762.541 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "OPERA", "POINT_X": 451043.5448, "POINT_Y": 5413270.433, "NEAR_FID": 0, "NEAR_DIST": 1850.9757419, "PM": 15 }, "geometry": { "type": "Point", "coordinates": [ 451043.544799999974, 5413270.433 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "VITRY", "POINT_X": 454088.8314, "POINT_Y": 5402754.681, "NEAR_FID": 0, "NEAR_DIST": 9436.6690239700001, "PM": 10 }, "geometry": { "type": "Point", "coordinates": [ 454088.8314, 5402754.68099999987 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "AUT", "POINT_X": 445175.2836, "POINT_Y": 5411100.362, "NEAR_FID": 0, "NEAR_DIST": 7316.1915253899997, "PM": 22 }, "geometry": { "type": "Point", "coordinates": [ 445175.2836, 5411100.36199999973 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "ISSY", "POINT_X": 446317.0097, "POINT_Y": 5408006.822, "NEAR_FID": 0, "NEAR_DIST": 7326.3161356399996, "PM": 12 }, "geometry": { "type": "Point", "coordinates": [ 446317.0097, 5408006.82199999969 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "HAUS", "POINT_X": 450834.6644, "POINT_Y": 5413601.335, "NEAR_FID": 0, "NEAR_DIST": 2229.33298909, "PM": 22 }, "geometry": { "type": "Point", "coordinates": [ 450834.6644, 5413601.335 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "RN2", "POINT_X": 455308.047, "POINT_Y": 5416726.464, "NEAR_FID": 0, "NEAR_DIST": 5495.6847717600003, "PM": 8 }, "geometry": { "type": "Point", "coordinates": [ 455308.047, 5416726.46399999969 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "ELYS", "POINT_X": 449539.3324, "POINT_Y": 5413084.843, "NEAR_FID": 0, "NEAR_DIST": 3072.4773847599999, "PM": 30 }, "geometry": { "type": "Point", "coordinates": [ 449539.3324, 5413084.843 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "BASCH", "POINT_X": 450570.5489, "POINT_Y": 5408534.315, "NEAR_FID": 0, "NEAR_DIST": 3972.3818664400001, "PM": 22 }, "geometry": { "type": "Point", "coordinates": [ 450570.5489, 5408534.315 ] } },
+{ "type": "Feature", "properties": { "FID_": null, "ID": 0, "StationID": "TREMB", "POINT_X": 468846.3647, "POINT_Y": 5422621.105, "NEAR_FID": 0, "NEAR_DIST": 19528.246577099999, "PM": 12 }, "geometry": { "type": "Point", "coordinates": [ 468846.364699999976, 5422621.105 ] } }
+]
+}
